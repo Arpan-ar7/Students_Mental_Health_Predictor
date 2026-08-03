@@ -1,173 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindGuard - Mental Health Score Predictor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-<base target="_blank">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mental Health Score Estimator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
 
-    <div class="particles" id="particles"></div>
+  <div class="page">
 
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">
-                <i class="fas fa-brain"></i>
-            </div>
-            <span class="logo-text">MindGuard</span>
-        </div>
-        <p class="subtitle">Analyze your digital habits and discover your mental wellness score. Our AI-powered predictor helps you understand the connection between screen time and mental health.</p>
+    <header class="masthead">
+      <p class="eyebrow">Student wellbeing model</p>
+      <h1>Mental Health Score Estimator</h1>
+      <p class="subhead">A short questionnaire estimates a mental health score (0–10) from social media habits, sleep, study, and lifestyle patterns. This is a modeling exercise, not a clinical assessment.</p>
     </header>
 
-    <div class="container">
-        <div class="form-card">
-            <form id="predictForm">
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label><i class="fas fa-calendar-alt"></i> Age</label>
-                        <input type="number" name="Age" min="10" max="100" placeholder="Enter your age" required>
-                    </div>
+    <main class="layout">
 
-                    <div class="input-group">
-                        <label><i class="fas fa-venus-mars"></i> Gender</label>
-                        <select name="Gender" required>
-                            <option value="" disabled selected>Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </div>
+      <form id="predict-form" class="panel form-panel" novalidate>
 
-                    <div class="input-group">
-                        <label><i class="fas fa-globe"></i> Country</label>
-                        <input type="text" name="Country" placeholder="e.g., India, USA, UK" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-graduation-cap"></i> Academic Level</label>
-                        <select name="Academic_Level" required>
-                            <option value="" disabled selected>Select Level</option>
-                            <option value="High School">High School</option>
-                            <option value="Undergraduate">Undergraduate</option>
-                            <option value="Graduate">Graduate</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-mobile-alt"></i> Most Used Platform</label>
-                        <select name="Most_Used_Platform" required>
-                            <option value="" disabled selected>Select Platform</option>
-                            <option value="Facebook">Facebook</option>
-                            <option value="Instagram">Instagram</option>
-                            <option value="Twitter">Twitter</option>
-                            <option value="TikTok">TikTok</option>
-                            <option value="YouTube">YouTube</option>
-                            <option value="Snapchat">Snapchat</option>
-                            <option value="LinkedIn">LinkedIn</option>
-                            <option value="WhatsApp">WhatsApp</option>
-                            <option value="WeChat">WeChat</option>
-                            <option value="LINE">LINE</option>
-                            <option value="KakaoTalk">KakaoTalk</option>
-                            <option value="VKontakte">VKontakte</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-bullseye"></i> Purpose of Use</label>
-                        <select name="Purpose_Of_Use" required>
-                            <option value="" disabled selected>Select Purpose</option>
-                            <option value="Entertainment">Entertainment</option>
-                            <option value="Education">Education</option>
-                            <option value="Networking">Networking</option>
-                            <option value="News">News</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-clock"></i> Daily Usage (hours)</label>
-                        <div class="range-container">
-                            <input type="range" name="Avg_Daily_Usage_Hours" min="0" max="24" step="0.5" value="3" id="usageRange">
-                            <span class="range-value" id="usageValue">3</span>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-unlock"></i> Daily Unlocks</label>
-                        <input type="number" name="Daily_Unlocks" min="0" placeholder="e.g., 45" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-book"></i> Study Hours</label>
-                        <div class="range-container">
-                            <input type="range" name="Study_Hours" min="0" max="24" step="0.5" value="2" id="studyRange">
-                            <span class="range-value" id="studyValue">2</span>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-running"></i> Physical Activity (hours)</label>
-                        <div class="range-container">
-                            <input type="range" name="Physical_Activity_Hours" min="0" max="24" step="0.5" value="1" id="activityRange">
-                            <span class="range-value" id="activityValue">1</span>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-bed"></i> Sleep per Night (hours)</label>
-                        <div class="range-container">
-                            <input type="range" name="Sleep_Hours_Per_Night" min="0" max="24" step="0.5" value="7" id="sleepRange">
-                            <span class="range-value" id="sleepValue">7</span>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label><i class="fas fa-heartbeat"></i> Stress Level</label>
-                        <select name="Stress_Level" required>
-                            <option value="" disabled selected>Select Level</option>
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                            <option value="Very High">Very High</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    Analyze My Mental Health <i class="fas fa-arrow-right"></i>
-                </button>
-            </form>
-
-            <div class="result-card" id="resultCard">
-                <div class="result-label">Your Mental Health Score</div>
-                <div class="progress-ring">
-                    <svg width="200" height="200">
-                        <circle class="progress-ring-bg" cx="100" cy="100" r="90"/>
-                        <circle class="progress-ring-fill" id="progressRing" cx="100" cy="100" r="90" stroke="url(#gradient)"/>
-                        <defs>
-                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#6366f1"/>
-                                <stop offset="100%" style="stop-color:#ec4899"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="progress-ring-text" id="scoreText">0</div>
-                </div>
-                <div class="result-message" id="resultMessage">Analyzing...</div>
-                <div class="result-desc" id="resultDesc">Please wait while we process your data.</div>
-            </div>
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-fill" id="progress-fill"></div>
         </div>
-    </div>
+        <p class="progress-label" id="progress-label">0 of 12 answered</p>
 
-    <div class="toast" id="toast"></div>
+        <fieldset class="field-group">
+          <legend><span class="legend-icon icon-person" aria-hidden="true"></span>About you</legend>
 
-    <script src="script.js"></script>
+          <div class="field">
+            <label for="age">Age</label>
+            <input type="number" id="age" name="Age" min="10" max="100" required placeholder="e.g. 21">
+          </div>
+
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select id="gender" name="Gender" required>
+              <option value="" disabled selected>Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="country">Country</label>
+            <input type="text" id="country" name="Country" required placeholder="e.g. India">
+          </div>
+
+          <div class="field">
+            <label for="academic">Academic level</label>
+            <select id="academic" name="Academic_Level" required>
+              <option value="" disabled selected>Select</option>
+              <option value="High School">High School</option>
+              <option value="Undergraduate">Undergraduate</option>
+              <option value="Graduate">Graduate</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend><span class="legend-icon icon-chat" aria-hidden="true"></span>Social media use</legend>
+
+          <div class="field">
+            <label for="platform">Most used platform</label>
+            <select id="platform" name="Most_Used_Platform" required>
+              <option value="" disabled selected>Select</option>
+              <option>Facebook</option>
+              <option>LinkedIn</option>
+              <option>Instagram</option>
+              <option>Snapchat</option>
+              <option>Twitter</option>
+              <option>YouTube</option>
+              <option>TikTok</option>
+              <option>LINE</option>
+              <option>KakaoTalk</option>
+              <option>VKontakte</option>
+              <option>WhatsApp</option>
+              <option>WeChat</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="purpose">Primary purpose of use</label>
+            <select id="purpose" name="Purpose_Of_Use" required>
+              <option value="" disabled selected>Select</option>
+              <option value="Networking">Networking</option>
+              <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="News">News</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="usage">Average daily usage (hours)</label>
+            <input type="number" id="usage" name="Avg_Daily_Usage_Hours" min="0" max="24" step="0.1" required placeholder="e.g. 4.5">
+          </div>
+
+          <div class="field">
+            <label for="unlocks">Daily phone unlocks</label>
+            <input type="number" id="unlocks" name="Daily_Unlocks" min="0" required placeholder="e.g. 60">
+          </div>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend><span class="legend-icon icon-leaf" aria-hidden="true"></span>Daily rhythm</legend>
+
+          <div class="field">
+            <label for="study">Study hours per day</label>
+            <input type="number" id="study" name="Study_Hours" min="0" max="24" step="0.1" required placeholder="e.g. 3">
+          </div>
+
+          <div class="field">
+            <label for="activity">Physical activity (hours/day)</label>
+            <input type="number" id="activity" name="Physical_Activity_Hours" min="0" max="24" step="0.1" required placeholder="e.g. 1">
+          </div>
+
+          <div class="field">
+            <label for="sleep">Sleep per night (hours)</label>
+            <input type="number" id="sleep" name="Sleep_Hours_Per_Night" min="0" max="24" step="0.1" required placeholder="e.g. 7">
+          </div>
+
+          <div class="field">
+            <label for="stress">Self-rated stress level</label>
+            <select id="stress" name="Stress_Level" required>
+              <option value="" disabled selected>Select</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Very High">Very High</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <button type="submit" id="submit-btn" class="submit-btn">
+          <span class="btn-label">Estimate score</span>
+        </button>
+
+        <p class="form-error" id="form-error" hidden></p>
+      </form>
+
+      <aside class="panel result-panel">
+        <p class="eyebrow">Result</p>
+
+        <div id="result-empty" class="result-empty">
+          <div class="empty-mark" aria-hidden="true"></div>
+          <p>Fill in the form and submit to see the estimated score.</p>
+        </div>
+
+        <div id="result-loading" class="result-loading" hidden>
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Scoring your responses…</p>
+        </div>
+
+        <div id="result-content" class="result-content" hidden>
+
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 200 120" class="gauge-svg">
+              <path d="M 20 110 A 80 80 0 0 1 180 110" class="gauge-track" />
+              <path d="M 20 110 A 80 80 0 0 1 180 110" class="gauge-value" id="gauge-value" />
+            </svg>
+            <div class="gauge-center">
+              <p class="score-number"><span id="score-value">0.0</span><span class="score-max">/10</span></p>
+              <p class="score-label" id="score-label">—</p>
+            </div>
+          </div>
+
+          <p class="result-note">Estimated by a Random Forest model trained on self-reported student survey data. Not a diagnosis — treat as a directional signal only.</p>
+        </div>
+      </aside>
+
+    </main>
+
+    <footer class="page-footer">
+      <p>Connects to a local FastAPI service at <code id="api-url-display"></code></p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

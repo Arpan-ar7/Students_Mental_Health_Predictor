@@ -1,155 +1,131 @@
-// Create floating particles
-const particlesContainer = document.getElementById('particles');
-for (let i = 0; i < 30; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDuration = (10 + Math.random() * 20) + 's';
-    particle.style.animationDelay = Math.random() * 15 + 's';
-    particle.style.width = (2 + Math.random() * 4) + 'px';
-    particle.style.height = particle.style.width;
-    particlesContainer.appendChild(particle);
+const API_BASE = "http://127.0.0.1:2200";
+
+document.getElementById("api-url-display").textContent = `${API_BASE}/predict`;
+
+const form = document.getElementById("predict-form");
+const submitBtn = document.getElementById("submit-btn");
+const formError = document.getElementById("form-error");
+
+const resultEmpty = document.getElementById("result-empty");
+const resultLoading = document.getElementById("result-loading");
+const resultContent = document.getElementById("result-content");
+
+const scoreValueEl = document.getElementById("score-value");
+const scoreLabelEl = document.getElementById("score-label");
+const gaugeValue = document.getElementById("gauge-value");
+
+const progressFill = document.getElementById("progress-fill");
+const progressLabel = document.getElementById("progress-label");
+
+const requiredFields = Array.from(form.querySelectorAll("[required]"));
+const gaugeLength = gaugeValue.getTotalLength();
+gaugeValue.style.strokeDasharray = gaugeLength;
+gaugeValue.style.strokeDashoffset = gaugeLength;
+
+function updateProgress() {
+  const filled = requiredFields.filter((el) => el.value !== "").length;
+  const pct = (filled / requiredFields.length) * 100;
+  progressFill.style.width = `${pct}%`;
+  progressLabel.textContent = `${filled} of ${requiredFields.length} answered`;
 }
 
-// Range slider updates
-document.getElementById('usageRange').addEventListener('input', function() {
-    document.getElementById('usageValue').textContent = this.value;
+requiredFields.forEach((el) => {
+  el.addEventListener("input", updateProgress);
+  el.addEventListener("change", updateProgress);
 });
+updateProgress();
 
-document.getElementById('studyRange').addEventListener('input', function() {
-    document.getElementById('studyValue').textContent = this.value;
-});
+function showState(state) {
+  resultEmpty.hidden = state !== "empty";
+  resultLoading.hidden = state !== "loading";
+  resultContent.hidden = state !== "content";
+}
 
-document.getElementById('activityRange').addEventListener('input', function() {
-    document.getElementById('activityValue').textContent = this.value;
-});
+function scoreLabel(score) {
+  if (score < 2.5) return "Struggling";
+  if (score < 5) return "Managing";
+  if (score < 7.5) return "Doing okay";
+  return "Thriving";
+}
 
-document.getElementById('sleepRange').addEventListener('input', function() {
-    document.getElementById('sleepValue').textContent = this.value;
-});
+function setError(message) {
+  if (!message) {
+    formError.hidden = true;
+    formError.textContent = "";
+    return;
+  }
+  formError.hidden = false;
+  formError.textContent = message;
+}
 
-// Form submission
-document.getElementById('predictForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+function setGauge(score) {
+  const pct = Math.min(1, Math.max(0, score / 10));
+  const offset = gaugeLength * (1 - pct);
+  gaugeValue.style.strokeDashoffset = offset;
+}
 
-    const btn = document.getElementById('submitBtn');
-    const resultCard = document.getElementById('resultCard');
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  setError(null);
 
-    // Convert numeric fields
-    data.Age = parseInt(data.Age);
-    data.Avg_Daily_Usage_Hours = parseFloat(data.Avg_Daily_Usage_Hours);
-    data.Daily_Unlocks = parseInt(data.Daily_Unlocks);
-    data.Study_Hours = parseFloat(data.Study_Hours);
-    data.Physical_Activity_Hours = parseFloat(data.Physical_Activity_Hours);
-    data.Sleep_Hours_Per_Night = parseFloat(data.Sleep_Hours_Per_Night);
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
 
-    btn.classList.add('loading');
-    btn.innerHTML = 'Analyzing... <i class="fas fa-spinner fa-spin"></i>';
+  const formData = new FormData(form);
 
-    try {
-        console.log('Sending data:', JSON.stringify(data));
+  const payload = {
+    Age: Number(formData.get("Age")),
+    Gender: formData.get("Gender"),
+    Country: formData.get("Country").trim(),
+    Academic_Level: formData.get("Academic_Level"),
+    Most_Used_Platform: formData.get("Most_Used_Platform"),
+    Purpose_Of_Use: formData.get("Purpose_Of_Use"),
+    Avg_Daily_Usage_Hours: Number(formData.get("Avg_Daily_Usage_Hours")),
+    Daily_Unlocks: Number(formData.get("Daily_Unlocks")),
+    Study_Hours: Number(formData.get("Study_Hours")),
+    Physical_Activity_Hours: Number(formData.get("Physical_Activity_Hours")),
+    Sleep_Hours_Per_Night: Number(formData.get("Sleep_Hours_Per_Night")),
+    Stress_Level: formData.get("Stress_Level"),
+  };
 
-        const response = await fetch('http://127.0.0.1:2200/predict', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+  submitBtn.disabled = true;
+  showState("loading");
 
-        console.log('Response status:', response.status);
+  try {
+    const response = await fetch(`${API_BASE}/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Server error:', errorText);
-            throw new Error('Server returned ' + response.status + ': ' + errorText);
-        }
-
-        const result = await response.json();
-        console.log('Received result:', result);
-
-        const score = result.predicted_mental_health_score;
-
-        // Show result
-        resultCard.classList.add('show');
-
-        // Animate score
-        animateScore(score);
-
-        // Set message based on score
-        const msgEl = document.getElementById('resultMessage');
-        const descEl = document.getElementById('resultDesc');
-        const scoreText = document.getElementById('scoreText');
-        const progressRing = document.getElementById('progressRing');
-
-        let color, message, desc;
-        if (score >= 70) {
-            color = '#10b981';
-            message = 'Excellent Mental Health!';
-            desc = 'Your digital habits support great mental wellness. Keep maintaining this healthy balance!';
-        } else if (score >= 50) {
-            color = '#f59e0b';
-            message = 'Moderate Mental Health';
-            desc = "You're doing okay, but there's room for improvement. Consider reducing screen time and increasing physical activity.";
-        } else {
-            color = '#ef4444';
-            message = 'Mental Health Needs Attention';
-            desc = 'Your current habits may be impacting your mental health. Try to limit social media use, improve sleep, and seek support if needed.';
-        }
-
-        scoreText.style.color = color;
-        progressRing.style.stroke = color;
-        msgEl.textContent = message;
-        msgEl.style.color = color;
-        descEl.textContent = desc;
-
-        // Scroll to result
-        resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    } catch (error) {
-        console.error('Error:', error);
-        showToast('Error: ' + error.message);
-    } finally {
-        btn.classList.remove('loading');
-        btn.innerHTML = 'Analyze My Mental Health <i class="fas fa-arrow-right"></i>';
-    }
-});
-
-function animateScore(targetScore) {
-    const scoreText = document.getElementById('scoreText');
-    const progressRing = document.getElementById('progressRing');
-    const circumference = 2 * Math.PI * 90;
-
-    let current = 0;
-    const duration = 1500;
-    const startTime = performance.now();
-
-    function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        current = Math.round(targetScore * easeOut);
-
-        scoreText.textContent = current;
-
-        const offset = circumference - (current / 100) * circumference;
-        progressRing.style.strokeDashoffset = offset;
-
-        if (progress < 1) {
-            requestAnimationFrame(update);
-        }
+    if (!response.ok) {
+      const errBody = await response.json().catch(() => null);
+      const detail = errBody?.detail
+        ? typeof errBody.detail === "string"
+          ? errBody.detail
+          : JSON.stringify(errBody.detail)
+        : `Request failed with status ${response.status}`;
+      throw new Error(detail);
     }
 
-    requestAnimationFrame(update);
-}
+    const data = await response.json();
+    const score = data.predicted_mental_health_score;
 
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 5000);
-}
+    scoreValueEl.textContent = score.toFixed(1);
+    scoreLabelEl.textContent = scoreLabel(score);
+    setGauge(score);
+
+    showState("content");
+  } catch (err) {
+    showState("empty");
+    setError(
+      err.message.includes("Failed to fetch")
+        ? `Couldn't reach the API at ${API_BASE}. Make sure uvicorn is running with CORS enabled and the port matches.`
+        : err.message
+    );
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
